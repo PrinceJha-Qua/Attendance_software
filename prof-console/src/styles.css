@@ -1,0 +1,13 @@
+body { margin: 0; font: 15px/1.4 system-ui, sans-serif; color: #111; }
+main { max-width: 960px; margin: 0 auto; padding: 20px; }
+h1, h2 { margin: 12px 0; }
+input, button, select { font: inherit; padding: 8px 12px; margin: 4px 4px 4px 0; border-radius: 6px; border: 1px solid #bbb; }
+button { background: #1b4dff; color: #fff; border: 0; cursor: pointer; } button.secondary { background: #eee; color: #111; } button.danger { background: #c0392b; }
+table { border-collapse: collapse; width: 100%; } td, th { text-align: left; padding: 6px 10px; border-bottom: 1px solid #ddd; }
+.card { display: inline-block; width: 190px; margin: 8px 12px 8px 0; vertical-align: top; } .card img { width: 190px; height: 190px; object-fit: cover; background: #ddd; border-radius: 8px; }
+.err { color: #c0392b; } .muted { color: #666; } .bar { display: flex; justify-content: space-between; align-items: center; }
+.stats { display: flex; gap: 24px; margin: 12px 0; } .stat b { display: block; font-size: 26px; }
+.panel { border: 2px solid #1b4dff; border-radius: 10px; padding: 8px 12px; margin: 16px 0; } .panel h3 { margin: 4px 0; }
+.attn { display: inline-block; width: 230px; margin: 8px 12px 8px 0; vertical-align: top; border: 1px solid #ddd; border-radius: 10px; padding: 8px; }
+.attn img { width: 100%; height: 210px; object-fit: cover; background: #ddd; border-radius: 8px; } .attn ul { margin: 4px 0; padding-left: 18px; font-size: 13px; }
+.s-checked_in, .s-present { color: #1e8449; } .s-review { color: #b9770e; font-weight: 600; } .s-not_here, .s-absent { color: #888; } .live-dot { color: #1e8449; } .off-dot { color: #c0392b; }

@@ -1,0 +1,12 @@
+# Parking lot (ideas NOT in v1; one line each, do not build)
+- Password change / reset flow for students (initial passwords are random and shown once to the professor)
+- Re-confirm enrollment per course instead of per student
+- Shorter QR payload (short public session code instead of 32-hex id) to get QR version 3-4 for back-row legibility; changes shared/TOKEN_SPEC.md and vectors, decide after room trials
+- Auto-fit QR to the largest size that fits the display
+- Void/cancelled session: a session started by mistake and closed with nobody present marks every student absent and lowers everyone's %. Needs a "void" action that excludes the session from the calculator (P10 only if AGY/field trials hit it; for now the professor can resolve everyone present or delete via CLI).
+- Dispute race: two simultaneous dispute POSTs for one record can both insert (no unique constraint on `disputes.record_id`; adding it needs a table rebuild). Low risk; fix with a migration when Alembic arrives.
+- Disputes have no deadline and no notification (no push/email in v1).
+- No schema migrations (create_all only): needed before any post-launch column change.
+- Multi-worker live feed (Redis pub/sub hub).
+- Postgres untested by automation; deploy files unverified without Docker.
+- Old access tokens cannot be revoked (stateless JWT, 1 h); logout is client-side.

@@ -1,0 +1,41 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Audio spike: emitter</title>
+<style>body{font:16px system-ui;max-width:640px;margin:16px auto;padding:0 16px}button{font-size:18px;padding:12px;margin:6px 0;width:100%}</style>
+<h2>Audio spike: emitter (run on the professor laptop)</h2>
+<p>Set the room volume as it would be in class. Press one button, then run the listener on phones around the room.</p>
+<button id="sweep">1. Sweep 16 to 20 kHz (10 s)</button>
+<button id="tone">2. Steady 19.5 kHz tone (toggle)</button>
+<button id="fsk">3. FSK burst loop, code 0xA5 (toggle)</button>
+<pre id="log"></pre>
+<script>
+const log = m => document.getElementById('log').textContent += m + '\n';
+let ctx; const A = () => ctx ||= new AudioContext({sampleRate: 48000});
+const GAIN = 0.5;
+document.getElementById('sweep').onclick = () => {
+  const c = A(), o = c.createOscillator(), g = c.createGain();
+  o.frequency.setValueAtTime(16000, c.currentTime);
+  o.frequency.linearRampToValueAtTime(20000, c.currentTime + 10);
+  g.gain.value = GAIN; o.connect(g).connect(c.destination); o.start(); o.stop(c.currentTime + 10);
+  log('sweep started ' + new Date().toISOString());
+};
+let tone;
+document.getElementById('tone').onclick = () => {
+  const c = A();
+  if (tone) { tone.stop(); tone = null; return log('tone off'); }
+  tone = c.createOscillator(); tone.frequency.value = 19500;
+  const g = c.createGain(); g.gain.value = GAIN; tone.connect(g).connect(c.destination); tone.start(); log('tone on');
+};
+// 4-FSK: 2 bits per symbol, carriers 18.6/18.9/19.2/19.5 kHz, 60 ms/symbol, preamble 19.8 kHz 120 ms
+const CARRIERS = [18600, 18900, 19200, 19500];
+let fskTimer;
+function burst(code) {
+  const c = A(), t0 = c.currentTime + 0.05, g = c.createGain(); g.gain.value = GAIN; g.connect(c.destination);
+  const sym = (f, t, d) => { const o = c.createOscillator(); o.frequency.value = f; o.connect(g); o.start(t); o.stop(t + d); };
+  sym(19800, t0, 0.12);
+  for (let i = 3; i >= 0; i--) sym(CARRIERS[(code >> (i * 2)) & 3], t0 + 0.12 + (3 - i) * 0.06, 0.06);
+}
+document.getElementById('fsk').onclick = () => {
+  if (fskTimer) { clearInterval(fskTimer); fskTimer = null; return log('fsk off'); }
+  fskTimer = setInterval(() => burst(0xA5), 1500); burst(0xA5); log('fsk loop on (burst every 1.5 s)');
+};
+</script>

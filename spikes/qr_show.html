@@ -1,0 +1,18 @@
+<!doctype html><meta charset="utf-8"><title>QR spike: show</title>
+<style>body{margin:0;background:#fff;font:14px system-ui}#c{display:block;margin:auto}#ui{position:fixed;top:4px;left:4px;background:#fffc;padding:4px}</style>
+<div id="ui">step ms <input id="step" type="number" value="1500" style="width:70px"> ECC <select id="ecc"><option>L</option><option selected>M</option><option>Q</option></select> size % <input id="size" type="range" min="20" max="100" value="60"> <span id="info"></span></div>
+<canvas id="c"></canvas>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script>
+const SESSION = 'spike', c = document.getElementById('c'), x = c.getContext('2d');
+function draw() {
+  const step = +document.getElementById('step').value, w = Math.floor(Date.now() / step);
+  const payload = `gk1:${SESSION}:${w}:SPIKE${(w % 1e11).toString(36).toUpperCase().padStart(11, '0')}`;
+  const q = qrcode(0, document.getElementById('ecc').value); q.addData(payload); q.make();
+  const n = q.getModuleCount(), px = Math.floor(Math.min(innerWidth, innerHeight) * document.getElementById('size').value / 100 / (n + 8));
+  c.width = c.height = px * (n + 8); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.fillStyle = '#000';
+  for (let r = 0; r < n; r++) for (let k = 0; k < n; k++) if (q.isDark(r, k)) x.fillRect((k + 4) * px, (r + 4) * px, px, px);
+  document.getElementById('info').textContent = `v${q.getModuleCount() ? (n - 17) / 4 : '?'} ${n}x${n} px/module ${px} window ${w}`;
+}
+setInterval(draw, 100); draw();
+</script>

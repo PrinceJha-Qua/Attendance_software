@@ -1,0 +1,28 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Audio spike: listener</title>
+<style>body{font:16px system-ui;max-width:640px;margin:16px auto;padding:0 16px}button,input{font-size:18px;padding:10px;margin:4px 0;width:100%}</style>
+<h2>Audio spike: listener (phones)</h2>
+<input id="who" placeholder="Phone model + seat zone, e.g. iPhone12 back-left">
+<button id="go">Start listening</button><button id="dl">Download log (JSON)</button>
+<div>19.5 kHz SNR: <b id="snr">-</b> dB · band max (18.5-19.9 kHz): <b id="peak">-</b> · 16 kHz level: <b id="ref">-</b></div>
+<pre id="out"></pre>
+<script>
+const rows = []; let an, buf, sr;
+document.getElementById('go').onclick = async () => {
+  const stream = await navigator.mediaDevices.getUserMedia({audio: {echoCancellation: false, noiseSuppression: false, autoGainControl: false}});
+  const ctx = new AudioContext({sampleRate: 48000}); sr = ctx.sampleRate;
+  const src = ctx.createMediaStreamSource(stream); an = ctx.createAnalyser(); an.fftSize = 8192; an.smoothingTimeConstant = 0; src.connect(an);
+  buf = new Float32Array(an.frequencyBinCount); setInterval(sample, 250);
+};
+const bin = f => Math.round(f / (sr / 2) * buf.length);
+function db(lo, hi, fn) { let v = fn === 'max' ? -200 : 0, n = 0; for (let i = bin(lo); i <= bin(hi); i++) { v = fn === 'max' ? Math.max(v, buf[i]) : v + buf[i]; n++; } return fn === 'max' ? v : v / n; }
+function sample() {
+  an.getFloatFrequencyData(buf);
+  const sig = db(19400, 19600, 'max'), floor = db(17000, 18200, 'mean'), peak = db(18500, 19900, 'max'), ref = db(15900, 16100, 'max');
+  const snr = sig - floor;
+  document.getElementById('snr').textContent = snr.toFixed(1); document.getElementById('peak').textContent = peak.toFixed(1); document.getElementById('ref').textContent = ref.toFixed(1);
+  rows.push({t: Date.now(), who: document.getElementById('who').value, snr_19k5: +snr.toFixed(2), peak_band: +peak.toFixed(2), level_16k: +ref.toFixed(2), floor_17_18k: +floor.toFixed(2)});
+  document.getElementById('out').textContent = rows.slice(-6).map(r => JSON.stringify(r)).join('\n');
+}
+document.getElementById('dl').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(rows, null, 1)])); a.download = 'audio_log_' + Date.now() + '.json'; a.click(); };
+</script>

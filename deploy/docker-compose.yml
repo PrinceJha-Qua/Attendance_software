@@ -1,0 +1,40 @@
+# Production stack: Caddy (HTTPS + static apps) -> backend (1 worker) -> Postgres + Redis.   Run:  docker compose up -d --build
+services:
+  backend:
+    build: { context: .., dockerfile: deploy/Dockerfile.backend }
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      GK_DATABASE_URL: postgresql://gk:${POSTGRES_PASSWORD}@db:5432/gk
+      GK_REDIS_URL: redis://redis:6379/0
+    depends_on: [db, redis]
+    healthcheck: { test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/api/v1/readyz')"], interval: 15s, retries: 5 }
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment: { POSTGRES_USER: gk, POSTGRES_DB: gk, POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}" }
+    volumes: [pgdata:/var/lib/postgresql/data]
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--save", "", "--appendonly", "no"]   # nonces and rate counters only; losing them on restart is fine
+  web-student:
+    build: { context: .., dockerfile: deploy/Dockerfile.web, args: { APP: student-pwa } }
+    volumes: [student:/out]
+    command: ["sh", "-c", "rm -rf /out/* && cp -r /srv/. /out/"]
+  web-prof:
+    build: { context: .., dockerfile: deploy/Dockerfile.web, args: { APP: prof-console } }
+    volumes: [prof:/out]
+    command: ["sh", "-c", "rm -rf /out/* && cp -r /srv/. /out/"]
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports: ["80:80", "443:443"]
+    env_file: .env
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - student:/srv/student:ro
+      - prof:/srv/prof:ro
+      - caddy_data:/data
+    depends_on: [backend, web-student, web-prof]
+volumes: { pgdata: {}, student: {}, prof: {}, caddy_data: {} }

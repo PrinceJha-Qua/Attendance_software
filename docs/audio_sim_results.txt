@@ -1,0 +1,17 @@
+burst 680 ms
+48000 Hz  clean                                    decoded 100/100  wrong-frames 0
+48000 Hz  noise 0.1 (amp .25: -8 dB broadband)     decoded 100/100  wrong-frames 0
+48000 Hz  noise 0.25 (-14 dB)                      decoded 100/100  wrong-frames 0
+48000 Hz  noise 0.5 (-20 dB)                       decoded 100/100  wrong-frames 0
+48000 Hz  echo 20ms/0.5 + noise .1                 decoded 100/100  wrong-frames 0
+48000 Hz  loud tones 1k/15k/16.5k + noise .1       decoded 100/100  wrong-frames 0
+48000 Hz  quiet amp .05 + noise .02                decoded 100/100  wrong-frames 0
+48000 Hz  10 min of noise+tone: false frames 0
+44100 Hz  clean                                    decoded 100/100  wrong-frames 0
+44100 Hz  noise 0.1 (amp .25: -8 dB broadband)     decoded 100/100  wrong-frames 0
+44100 Hz  noise 0.25 (-14 dB)                      decoded 100/100  wrong-frames 0
+44100 Hz  noise 0.5 (-20 dB)                       decoded 100/100  wrong-frames 0
+44100 Hz  echo 20ms/0.5 + noise .1                 decoded 100/100  wrong-frames 0
+44100 Hz  loud tones 1k/15k/16.5k + noise .1       decoded 100/100  wrong-frames 0
+44100 Hz  quiet amp .05 + noise .02                decoded 100/100  wrong-frames 0
+44100 Hz  10 min of noise+tone: false frames 0

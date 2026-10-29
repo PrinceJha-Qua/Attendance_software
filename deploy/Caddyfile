@@ -1,0 +1,38 @@
+# {$STUDENT_HOST} and {$PROF_HOST} come from .env. Caddy gets and renews the HTTPS certificates itself.
+(security) {
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options nosniff
+		Referrer-Policy no-referrer
+		X-Frame-Options DENY
+		-Server
+	}
+}
+
+{$STUDENT_HOST} {
+	import security
+	header Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; media-src 'self' blob:; worker-src 'self' blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'"
+	header Permissions-Policy "camera=(self), microphone=(self), geolocation=()"
+	handle /api/* {
+		reverse_proxy backend:8000
+	}
+	handle {
+		root * /srv/student
+		try_files {path} /index.html
+		file_server
+	}
+}
+
+{$PROF_HOST} {
+	import security
+	header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data:; connect-src 'self' wss://{$PROF_HOST}; frame-ancestors 'none'; base-uri 'none'"
+	header Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	handle /api/* {
+		reverse_proxy backend:8000
+	}
+	handle {
+		root * /srv/prof
+		try_files {path} /index.html
+		file_server
+	}
+}

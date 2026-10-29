@@ -1,0 +1,12 @@
+# build context = repo root;  docker build -f deploy/Dockerfile.web --build-arg APP=student-pwa .
+FROM node:22-slim AS build
+ARG APP
+WORKDIR /w
+COPY shared ./shared
+COPY ${APP} ./${APP}
+WORKDIR /w/${APP}
+RUN npm ci && npm run build
+
+FROM caddy:2-alpine
+ARG APP
+COPY --from=build /w/${APP}/dist /srv

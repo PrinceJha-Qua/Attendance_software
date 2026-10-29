@@ -1,0 +1,29 @@
+<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QR spike: scan</title>
+<style>body{font:16px system-ui;margin:8px}video{width:100%;max-height:60vh;background:#000}input,button{font-size:16px;padding:8px;width:100%;margin:3px 0}</style>
+<input id="who" placeholder="Phone + distance/zone, e.g. Pixel7 back 20m"><button id="go">Start camera</button><button id="dl">Download log</button>
+<video id="v" playsinline muted></video><div>decodes: <b id="n">0</b> · fps: <b id="fps">0</b> · last latency ms: <b id="lat">-</b></div><pre id="o"></pre>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.min.js"></script>
+<script>
+const rows = [], v = document.getElementById('v'), cv = document.createElement('canvas'), cx = cv.getContext('2d', {willReadFrequently: true});
+let n = 0, frames = 0, t0 = performance.now(), last = '', firstSeen = {};
+document.getElementById('go').onclick = async () => {
+  v.srcObject = await navigator.mediaDevices.getUserMedia({video: {facingMode: 'environment', width: {ideal: 1920}, height: {ideal: 1080}}}); await v.play(); loop();
+};
+function loop() {
+  if (v.videoWidth) {
+    cv.width = v.videoWidth; cv.height = v.videoHeight; cx.drawImage(v, 0, 0); frames++;
+    const img = cx.getImageData(0, 0, cv.width, cv.height), t = performance.now(), r = jsQR(img.data, img.width, img.height, {inversionAttempts: 'dontInvert'});
+    const dt = performance.now() - t;
+    if (r && r.data !== last) {
+      last = r.data; n++; const w = +r.data.split(':')[2], age = Date.now() - w * 1500;
+      rows.push({t: Date.now(), who: document.getElementById('who').value, payload: r.data, decode_ms: +dt.toFixed(1), age_in_window_ms: age, res: `${cv.width}x${cv.height}`});
+      document.getElementById('n').textContent = n; document.getElementById('lat').textContent = dt.toFixed(0);
+      document.getElementById('o').textContent = rows.slice(-5).map(x => JSON.stringify(x)).join('\n');
+    }
+    if (performance.now() - t0 > 1000) { document.getElementById('fps').textContent = frames; frames = 0; t0 = performance.now(); }
+  }
+  requestAnimationFrame(loop);
+}
+document.getElementById('dl').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(rows, null, 1)])); a.download = 'qr_log_' + Date.now() + '.json'; a.click(); };
+</script>
