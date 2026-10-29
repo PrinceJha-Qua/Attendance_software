@@ -2,7 +2,7 @@
  "openapi": "3.1.0",
  "info": {
   "title": "GateKeeper",
-  "version": "1.0.0"
+  "version": "1.0.0-rc1"
  },
  "paths": {
   "/api/v1/auth/login": {

@@ -1,5 +1,5 @@
 // Ultrasonic burst codec shared by the professor emitter and the student receiver. Pure maths, no DOM, so it is testable in Node.
-// Design (reports/Ultrasonic attendance audio reliability.md): a slow up-chirp preamble, then 32 bits sent as chirp keying
+// Design (docs/research/ultrasonic-audio-reliability.md): a slow up-chirp preamble, then 32 bits sent as chirp keying
 // (bit 1 = fast up-chirp, bit 0 = fast down-chirp) inside 17.5-19.0 kHz. Chirps are detected with a matched filter on complex
 // baseband, so the receiver needs no carrier phase and tolerates the loud, uneven mic response of phones.
 // Payload: window mod 256 (8 bits) + code16 (16 bits, server HMAC of the window) + CRC-8.

@@ -1,6 +1,6 @@
 # GateKeeper v1: Scope Fence, Interfaces, API, and 10 Phases
 
-Supersedes the phase list in `BUILD_PLAN.md` §6. Everything else in `BUILD_PLAN.md` (spec corrections §0, trust model §2, decisions §12) still stands. Audio now follows `reports/Ultrasonic attendance audio reliability.md`.
+Supersedes the phase list in `docs/design/BUILD_PLAN.md` §6. Everything else in `docs/design/BUILD_PLAN.md` (spec corrections §0, trust model §2, decisions §12) still stands. Audio now follows `docs/research/ultrasonic-audio-reliability.md`.
 
 ---
 
@@ -138,7 +138,7 @@ Base `/api/v1`, JSON, JWT. Errors `{error:{code,message,request_id}}`. Mutations
 | POST | `/disputes/{id}/decide` | `accept/reject` + note |
 
 **Ops**: `GET /healthz`, `GET /readyz`, `GET /students/{id}/photo?sig=` (signed, ≤ 5 min, professor of that session only, audit-logged).
-Total: about 45 endpoints. Check-in outcome: `VERIFIED | REVIEW | REJECTED`; audio missing never rejects (flag `AUDIO_UNAVAILABLE`). Error codes as in `BUILD_PLAN.md` §3.3.
+Total: about 45 endpoints. Check-in outcome: `VERIFIED | REVIEW | REJECTED`; audio missing never rejects (flag `AUDIO_UNAVAILABLE`). Error codes as in `docs/design/BUILD_PLAN.md` §3.3.
 
 ---
 
@@ -169,7 +169,7 @@ Total software budget: **≈ 46 hours (2 days)**. Each phase ends with an AGY te
 - **Build:** student scan screen (zxing-wasm), `/challenge` (issue only), `/checkin` with QR gate + per-student nonce + idempotency + roster/enrollment checks, result screen; session active list. No face/audio yet.
 - **Cut list:** torch/zoom controls.
 - **Exit:** two real phones check in against a real projection; duplicate scan returns the same result.
-- **AGY:** E2E with fake camera video of a QR; concurrency test 240 check-ins in 15 s; replay and relay-delay cases; load targets from `BUILD_PLAN.md` §5 B-PERF-01/03.
+- **AGY:** E2E with fake camera video of a QR; concurrency test 240 check-ins in 15 s; replay and relay-delay cases; load targets from `docs/design/BUILD_PLAN.md` §5 B-PERF-01/03.
 
 ### P5. Face layer + trust scorer (5 h)
 - **Build:** on-device face embedding (one model, fixed), match to enrolled template, in-session collision check, colour-flash liveness, trust scorer producing VERIFIED/REVIEW/REJECTED + flags, per-device passkey binding (single option: platform passkey).
@@ -204,7 +204,7 @@ Total software budget: **≈ 46 hours (2 days)**. Each phase ends with an AGY te
 - **AGY:** security suite (IDOR, JWT tampering, injection basics, rate limits), chaos (Redis restart, DB slow), full load run B-PERF-01..06, soak.
 
 ### P10. Freeze, full regression, field kit (5 h)
-- **Build:** bug fixes from AGY reports only, seed demo data, short README + runbook, field-trial checklist (`docs/FIELD_PROTOCOL.md` from `BUILD_PLAN.md` §7 plus the audio measurement plan in the reliability report), tag `v1.0-rc1`.
+- **Build:** bug fixes from AGY reports only, seed demo data, short README + runbook, field-trial checklist (`docs/FIELD_PROTOCOL.md` from `docs/design/BUILD_PLAN.md` §7 plus the audio measurement plan in the reliability report), tag `v1.0-rc1`.
 - **Cut list:** everything except the above.
 - **Exit:** AGY full regression green across Chrome Android + Safari iOS; RC deployed; known-issues list written.
 

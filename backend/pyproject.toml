@@ -1,6 +1,6 @@
 [project]
 name = "gatekeeper-backend"
-version = "0.1.0"
+version = "1.0.0rc1"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi>=0.115",

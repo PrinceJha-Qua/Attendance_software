@@ -2,7 +2,7 @@
 
 > **Update 2026-10-26:** the phase list (§6), API (§3) and app scope (§4) are superseded by `docs/V1_SCOPE_AND_PHASES.md` (10 phases, tightly scoped). Everything else here still applies.
 
-Source spec: `product_description_and_benchmarking_suite (1).md` (identical to `~/Developer/product_description_and_benchmarking_suite.md`).
+Source spec: `product_description_and_benchmarking_suite.md` (this folder).
 Builder: Claude Code. Integration/E2E verification: Antigravity (AGY). Target: release candidate in 48 h, then classroom trials.
 
 ---

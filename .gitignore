@@ -1,6 +1,20 @@
+# Python
 .venv/
 __pycache__/
-*.db
-.env
+*.pyc
+.pytest_cache/
+.ruff_cache/
+# Node
 node_modules/
 dist/
+*.tsbuildinfo
+# Local data and secrets
+*.db
+*.db-wal
+*.db-shm
+.env
+!.env.example
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/

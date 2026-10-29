@@ -2,6 +2,7 @@ import json
 import logging
 import time
 import uuid
+from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
@@ -24,17 +25,20 @@ def _log(**fields) -> None:
     log.info(json.dumps(fields, separators=(",", ":")) if config.LOG_JSON else " ".join(f"{k}={v}" for k, v in fields.items()))
 
 
-# The interactive docs and schema are for development; production exposes neither.
-app = FastAPI(title="GateKeeper", version="1.0.0", openapi_url=None if PROD else f"{API}/openapi.json", docs_url=None if PROD else "/docs", redoc_url=None)
-
-
-@app.on_event("startup")
-def _create_tables():
+@asynccontextmanager
+async def lifespan(_: FastAPI):
     from app import models  # noqa: F401  (register tables)
     Base.metadata.create_all(engine)
     _log(event="startup", env=config.ENV, face_mode=config.FACE_MODE, trial_mode=config.TRIAL_MODE, redis=bool(config.REDIS_URL))
     if config.TRIAL_MODE:
         log.warning("TRIAL MODE is on: phone audio telemetry is being stored")
+    yield
+
+
+# The interactive docs and schema are for development; production exposes neither.
+app = FastAPI(title="GateKeeper", version="1.0.0-rc1", lifespan=lifespan, openapi_url=None if PROD else f"{API}/openapi.json", docs_url=None if PROD else "/docs", redoc_url=None)
+
+
 
 
 @app.middleware("http")
